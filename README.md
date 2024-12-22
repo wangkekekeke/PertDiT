@@ -6,7 +6,7 @@
 To clone PertDiT, run:
 ```
 git clone https://github.com/wangkekekeke/PertDiT.git
-cd PertDiT
+cd PertDiT/src
 ```
 Preprocessed LINCS_L1000 dataset can be downloaded in PRnet repository: https://github.com/Perturbation-Response-Prediction/PRnet. 
 
