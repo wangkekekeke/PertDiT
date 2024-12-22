@@ -1,0 +1,49 @@
+
+#type: args
+
+result_name: "AdaDiT"
+train_batchs: 5000
+valid_batchs: 110
+valid_sampling_step: 5
+test_batchs: -1
+drug_encoder: "Rdkit" #in ["LLM", "LLM_mean", "Rdkit"]
+using_FC: false
+using_cfg: false
+
+train:
+  split: "Both_unseen" #in ["random_split_0", "cell_type_split_0", "drug_split_0", "cov_drug_dose_name_split_0", "Both_unseen"]
+  epochs: 1000
+  batch_size: 64
+  lr: 5.0e-4
+  patience: 60
+  early_stopping_patience: 10
+
+scheduler:
+  lr_max: 1.0e-3
+  warmup_n_steps: 5000
+  lr_start: 5.0e-4
+  T_max: 1000000
+  lr_min: 5.0e-5
+
+model:
+  model_type: "Ada" #in ["Ada", "DirectAda", "Cross", "DirectCross", "PR"]
+  num_layers: 2
+  d_model: 256
+  d_cond: 1024
+  d_pre: 978
+  mlp_hidden_dim: 256
+  num_heads: 4
+  dropout: 0
+
+# https://pure.tue.nl/ws/portalfiles/portal/312784353/A_Fair_Optimization_of_Diffusion_Model_for_2D_Cardiac_MR_Image_Generation.pdf 0.0001×1000/timestep to 0.02×1000/timestep
+diffusion:
+  sampler_type: "DDPM"
+  beta_start: 0.002
+  beta_end: 0.4
+  beta_schedule: "scaled_linear"
+  train_steps: 50
+  num_steps: 50
+  cfg_prob: 0.1
+  guidance_scale: 3.0
+
+device: "cuda:0"
