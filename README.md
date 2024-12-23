@@ -42,6 +42,8 @@ python train_split.py --cfg Ada
 ```
 The metrics can be calculated and visualized by running test_all_simple.ipynb
 
+## Citation
+
 ## License
 This project is covered under the Apache 2.0 License.
 
