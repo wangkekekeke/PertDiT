@@ -3,6 +3,7 @@ from rdkit import Chem
 from rdkit.Chem import AllChem
 from tqdm import tqdm
 
+# This function is cited from https://github.com/Perturbation-Response-Prediction/PRnet
 def Drug_dose_encoder(drug_SMILES_list: list, dose_list: list, num_Bits=1024, comb_num=1):
     """
     Encode SMILES of drug to rFCFP fingerprint

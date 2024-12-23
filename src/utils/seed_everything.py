@@ -13,6 +13,7 @@
 # limitations under the License.
 """Utilities to help with reproducibility of models."""
 
+# This function is cited from pytorch_lightning, you can also directly import seed_everything from pytorch_lightning
 import logging
 import os
 import random

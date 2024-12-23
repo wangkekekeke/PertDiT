@@ -37,7 +37,6 @@ class Diffusion_Sampler:
         self.loss_ratio = loss_ratio if loss_ratio is not None else 1.0
 
     def diffusion_loss_fn(self, model, x, x_cond, x_drug, mask=None, cat=False):
-        """对任意时刻t进行采样计算loss"""
         batch_size = x.shape[0]
         t = torch.randint(0, self.scheduler.config.num_train_timesteps, size=(batch_size,1))
         noise = torch.randn_like(x)
@@ -93,7 +92,6 @@ class Diffusion_Sampler:
     
     @torch.no_grad()
     def exp2exp(self, model, shape, x_cond, x_drug, mask=None, uncond=None, guidance_scale=None, cat=False):
-        """先加噪,再去噪,从x[T]恢复x[T-1]、x[T-2]|...x[0]"""
         if self.t_add is None:
             print('Please set t_add in the config file')
             raise NotImplementedError
@@ -136,7 +134,6 @@ class Diffusion_Sampler:
         return x_t
 
     def diffusion_loss_fn_unet(self, model, x, x_cond, x_drug, mask):
-        """对任意时刻t进行采样计算loss"""
         batch_size = x.shape[0]
         t = torch.randint(0, self.scheduler.config.num_train_timesteps, size=(batch_size,1))
         noise = torch.randn_like(x)
@@ -160,12 +157,10 @@ class Diffusion_Sampler:
             x_input = torch.stack([x_t,x_cond],dim=-1)
             output = model(x_input, x_drug, t).squeeze(-1)
         original_loss = F.mse_loss(output, x, reduction='mean')
-        # 判断正负一致性并计算二分类 loss
         positive_indicator_original = (x - x_cond > 0).float()
         positive_indicator_generated = (output - x_cond > 0).float()
         binary_cross_entropy_loss_per_sample = torch.nn.BCELoss(reduction='mean')(positive_indicator_generated, positive_indicator_original)
         scaling_factor = original_loss.detach() / binary_cross_entropy_loss_per_sample.detach()
-        # 结合两种 loss
         total_loss = self.loss_ratio*original_loss + (1-self.loss_ratio)*binary_cross_entropy_loss_per_sample*scaling_factor
         return total_loss
 

@@ -39,14 +39,14 @@ class EDM_classification_Loss:
             D_yn = model(x + n, x_cond, x_drug, sigma)
         else:
             D_yn = model(x + n, x_cond, x_drug, sigma, mask)
-        # 计算原始 loss
+        # initial loss
         original_loss = (weight * ((D_yn - x) ** 2)).mean()
-        # 判断正负一致性并计算二分类 loss
+        # binary loss
         positive_indicator_original = (x - x_cond > 0).float()
         positive_indicator_generated = (D_yn - x_cond > 0).float()
         binary_cross_entropy_loss_per_sample = (weight * (torch.nn.BCELoss(reduction='none')(positive_indicator_generated, positive_indicator_original))).mean()
         scaling_factor = original_loss.detach() / binary_cross_entropy_loss_per_sample.detach()
-        # 结合两种 loss
+        # combine two losses
         total_loss = self.loss_ratio*original_loss + (1-self.loss_ratio)*binary_cross_entropy_loss_per_sample*scaling_factor
         return total_loss
 

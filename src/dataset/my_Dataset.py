@@ -7,6 +7,7 @@ from torch.utils.data import Dataset, DataLoader
 from functools import partial
 from dataset.drug_dose_encoder import Drug_dose_encoder
 
+# There classes are partially cited from https://github.com/Perturbation-Response-Prediction/PRnet
 class myDataset_LLM(Dataset):
     def __init__(self, adata, pert_smiles_emb, dosage_prompt_emb, device, cfg=False, cfg_prob=0.1, FC=False, scale=False):
         super(Dataset, self).__init__()

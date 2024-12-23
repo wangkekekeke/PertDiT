@@ -10,7 +10,7 @@ using_FC: False
 using_cfg: False
 
 train:
-  split: "Both_unseen" #in ["random_split_0", "cell_type_split_0", "drug_split_0", "cov_drug_dose_name_split_0", "Both_unseen"]
+  split: "Both_unseen" #in ["random_split_0", "cell_type_split_0", "drug_split_0", "Both_unseen"]
   epochs: 1000
   batch_size: 64
   lr: 5.0e-4
@@ -25,7 +25,7 @@ scheduler:
   lr_min: 5.0e-5
 
 model:
-  model_type: "CatCross" #in ["Ada", "DirectAda", "Cross", "DirectCross", "PR"]
+  model_type: "CatCross" #in ["Ada", "CatBasicCross", "Cross"]
   num_layers: 2
   d_model: 256
   d_cond: 1024

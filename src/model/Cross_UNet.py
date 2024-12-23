@@ -4,8 +4,9 @@ import torch.nn.functional as F
 import numpy as np
 from torch import einsum
 from einops import rearrange,repeat
+# These classes are partially cited from https://github.com/YangLabHKUST/SpatialScope
 
-#一维卷积
+# Conv1d with orthogonal initialization
 class Conv1dWithInitialization(nn.Module):
     def __init__(self, **kwargs):
         super(Conv1dWithInitialization, self).__init__()
@@ -17,7 +18,7 @@ class Conv1dWithInitialization(nn.Module):
         return self.conv1d(x)
 
 
-#升降采样
+# Downsample and Upsample
 class Downsample(nn.Module):
     def __init__(self, in_channels, scale_factor, with_conv = True):
         super().__init__()
@@ -57,7 +58,7 @@ class Upsample(nn.Module):
         return x
     
 
-#Cblock
+# Cblock
 class ConvolutionBlock(nn.Module):
     def __init__(self, in_channels, out_channels, dilation):
         super(ConvolutionBlock, self).__init__()
@@ -109,7 +110,7 @@ class CBlock(nn.Module):
         return outputs
     
 
-#FILM
+# FILM
 class FILM(nn.Module):
     def __init__(self, in_channels, out_channels=None):
         super().__init__()
@@ -146,7 +147,7 @@ class FILM(nn.Module):
         return scale, shift
     
 
-#Mblock
+# Mblock
 class FeatureWiseAffine(nn.Module):
     def __init__(self, n_channels):
         super(FeatureWiseAffine, self).__init__()
@@ -235,7 +236,7 @@ class MBlock(nn.Module):
         return outputs
     
 
-#Cross attention
+# Cross attention
 class MultiHead_CrossAttention(nn.Module):
     def __init__(self, d_drug, d_exp, dim, d_v, num_head, d_o):
         '''
@@ -341,7 +342,6 @@ class FeedForward(nn.Module):
 class BasicTransformerBlock(nn.Module):
     def __init__(self, d_drug, d_exp, dim,num_head, d_o,gated_ff=True,dropout=0.):
         super().__init__()
-        #自注意力搞不动啊
         #self.attn1 = CrossAttention(query_dim=dim, heads=n_heads, dim_head=d_head, dropout=dropout)  # is a self-attention
         self.ff = FeedForward(d_o, dropout=dropout, glu=gated_ff)
         self.attn2 = mask_cross_attn(cond_d=d_drug, x_d=d_exp, dim=dim, heads=num_head, d_out=d_o)
@@ -357,7 +357,7 @@ class BasicTransformerBlock(nn.Module):
         return exp.permute(0,2,1)
     
 
-#time embedding
+# time embedding
 class DiffusionEmbedding(nn.Module):
     def __init__(self, num_steps, embedding_dim=128, projection_dim=None):
         super().__init__()
@@ -386,7 +386,7 @@ class DiffusionEmbedding(nn.Module):
         table = torch.cat([torch.sin(table), torch.cos(table)], dim=1)  # (T,dim*2)
         return table
 
-#Dim calculator
+# Dim calculator
 def conv1d_out_dim(input,padding,dilation,kernel,stride):
     return int((input+2*padding-dilation*(kernel-1)-1)/stride+1)
 def convtranspose1d_out_dim(input,padding,dilation,kernel,stride,output_padding=0):
@@ -395,22 +395,22 @@ def out_padding(input,target,stride):
     return target-convtranspose1d_out_dim(input,3,1,7,stride)
 
 
-#Unet
+# Unet
 class cross_attention_unet(nn.Module):
     def __init__(self, input_dim: int, channel_dim: list = [32,64,128,196], strides: list = [3,4,5,1], 
                 drug_input_dim: int = 16, n_heads: int = 4,num_steps: int = 50, device = torch.device("cpu")):
         super().__init__()
         self.device=device
-        # 网络参数
+        # Parameters
         self.channel_dim = channel_dim
         self.strides = strides
         self.Cblock_dilations = [[1,2,4]]
         self.Mblock_dilations = [[1,2,1,2]]
-        # 网络模块
+        # Modules
         self.time_embedding = DiffusionEmbedding(num_steps)
         self.diffusion_projections = torch.nn.ModuleList([nn.Linear(128, channel_dims) for channel_dims in self.channel_dim])
         
-        # 左半分支
+        # left branch
         self.pre_conv = Conv1dWithInitialization(
             in_channels=1,
             out_channels=self.channel_dim[0],
@@ -482,7 +482,7 @@ class cross_attention_unet(nn.Module):
         )
         ])
 
-        # 右半分支
+        # right branch
         dims = [input_dim]
         output_paddings = []
         input = input_dim
@@ -576,7 +576,7 @@ class cross_attention_unet(nn.Module):
                     nn.init.zeros_(module.bias)
     
     def forward(self, x, x_cond, time, x_drug, mask):
-        #x和x_cond输入维度为B,channel,genes,x_drug维度为B,tokens,embdding_dim
+        #x, x_cond dim:(B,channel,genes),x_drug dim:(B,tokens,embdding_dim)
         time_embed = self.time_embedding(time).squeeze(1)
         time_embeddings = []
         for time_projector in self.diffusion_projections:

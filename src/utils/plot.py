@@ -19,21 +19,15 @@ def plot_heatmap_change(res_pd, fig_size = (8, 6), title = "Heatmap of Random_sp
 def plot_res_partial_seperate(col, method1_data, method2_data, method3_data, method_names = ['PRNet', 'AdaDiT', 'CrossDiT']):
     all_data = np.column_stack([np.array(method1_data.iloc[:,col]).reshape(3,5), np.array(method2_data.iloc[:,col]).reshape(3,5)]).reshape(3,2,5)
     part_data = []
-    # part_data.append(np.row_stack((all_data[0][:,0:2],method3_data.iloc[:,col].values[0:2])))
-    # part_data.append(np.row_stack((all_data[1],method3_data.iloc[:,col].values[2:7])))
-    # part_data.append(np.concatenate([all_data[2][:,0], method3_data.iloc[:,col].values[[7]]]).reshape(3,-1))
     part_data.append(np.row_stack((all_data[0],method3_data.iloc[:,col].values[0:5])))
     part_data.append(np.row_stack((all_data[1],method3_data.iloc[:,col].values[5:10])))
     part_data.append(np.row_stack((all_data[2][:,0:3], method3_data.iloc[:,col].values[10:13])))
     print(part_data)
-    # 方法名称
     method_names = ['PRNet', 'AdaDiT', 'CrossDiT']
     experiments = ['Random Split', 'Unseen drugs', 'Unseen cell lines']
-    # 创建一个包含三个子图的图形
     fig, axes = plt.subplots(1, 3, figsize=(10, 3), sharey=True)
     max_val=-1
     for i, ax in enumerate(axes):
-        # 绘制柱状图和散点图
         data = part_data[i]
         max_val = max(max_val, data.max())
         for j in range(len(data)):
@@ -44,15 +38,7 @@ def plot_res_partial_seperate(col, method1_data, method2_data, method3_data, met
         ax.set_title(experiments[i])
         ax.set_xticks(np.arange(len(data)))
         ax.set_xticklabels(method_names)
-        # ax.set_ylim(0,max_val*1.1)
-
-    # 添加共同的 y 轴标签
     fig.text(0.05, 0.5, method1_data.columns[col], va='center', rotation='vertical', fontsize=12)
-
-    # 添加图例
-    # handles, labels = axes[0].get_legend_handles_labels()
-    # fig.legend(handles, labels, loc='center right')
-
     plt.show()
 
 def plot_res_seperate(col, method1_data, method2_data, method3_data, method_names = ['PRNet', 'AdaDiT', 'CrossDiT']):
@@ -60,11 +46,9 @@ def plot_res_seperate(col, method1_data, method2_data, method3_data, method_name
                                 np.array(method2_data.iloc[:,col]).reshape(3,5), 
                                 np.array(method3_data.iloc[:,col]).reshape(3,5)]).reshape(3,3,5)
     experiments = ['Random Split', 'Unseen drugs', 'Unseen cell lines']
-    # 创建一个包含三个子图的图形
     fig, axes = plt.subplots(1, 3, figsize=(10, 3), sharey=True)
     max_val=-1
     for i, ax in enumerate(axes):
-        # 绘制柱状图和散点图
         data = all_data[i]
         max_val = max(max_val, data.max())
         for j in range(len(data)):
@@ -75,15 +59,7 @@ def plot_res_seperate(col, method1_data, method2_data, method3_data, method_name
         ax.set_title(experiments[i])
         ax.set_xticks(np.arange(len(data)))
         ax.set_xticklabels(method_names)
-        # ax.set_ylim(0,max_val*1.1)
-
-    # 添加共同的 y 轴标签
     fig.text(0.05, 0.5, method1_data.columns[col], va='center', rotation='vertical', fontsize=12)
-
-    # 添加图例
-    # handles, labels = axes[0].get_legend_handles_labels()
-    # fig.legend(handles, labels, loc='center right')
-
     plt.show()
 
 def plot_res(col, method1_data, method2_data, method3_data, method_names=['PRNet', 'CatCrossDiT', 'CrossDiT'],ax = None):
@@ -91,26 +67,18 @@ def plot_res(col, method1_data, method2_data, method3_data, method_names=['PRNet
                                 np.array(method2_data.iloc[:, col]).reshape(3, 5),
                                 np.array(method3_data.iloc[:, col]).reshape(3, 5)]).reshape(3, 3, 5)
     experiments = ['Random Split', 'Unseen drugs', 'Unseen cell lines']
-
-    # 设置柱状图宽度和间距
     bar_width = 0.2
     bar_gap = 0.05
-
-    # 创建图形和坐标轴
     if ax is None:
         fig, ax = plt.subplots(figsize=(4, 6))
     else:
         fig = ax.get_figure()
-    # fig, ax = plt.subplots(figsize=(8, 6))
-
     max_val = -1
-
     for i in range(len(all_data)):
         data = all_data[i]
         max_val = max(max_val, data.max())
         for j in range(len(data)):
             color = plt.cm.tab10(j)
-            # 调整柱状图的位置
             bar_positions = np.arange(len(experiments)) + (j - 1) * bar_width + bar_gap
             ax.bar(bar_positions[i], data[j].mean(), width=bar_width, label=method_names[j], yerr=data[j].std(),
                    capsize=5, color=color)
@@ -121,11 +89,6 @@ def plot_res(col, method1_data, method2_data, method3_data, method_names=['PRNet
     ax.set_xticklabels(experiments)
     ax.set_title(method1_data.columns[col])
     ax.set_ylim(0, max_val * 1.1)
-
-    # 添加共同的 y 轴标签
-    # fig.text(0.05, 0.5, method1_data.columns[col], va='center', rotation='vertical', fontsize=12)
-
-    # 添加图例
     if col==9:
         handles, labels = ax.get_legend_handles_labels()
         print(handles, labels)
@@ -154,20 +117,13 @@ def plot_res_mysplit_seperate(col, method1_data, method2_data, method3_data, met
 def plot_res_mysplit(col, method_datas, method_names=['PRNet', 'ChemCPA', 'CatCrossDiT', 'CrossDiT'],ax = None):
     num_methods = len(method_datas)
     all_data = np.column_stack([np.array(method_datas[i].iloc[:,col]).reshape(3,1) for i in range(num_methods)])
-    
     experiments = ['Unseen drugs', 'Unseen cell lines', 'Both unseen']
-
-    # 设置柱状图宽度和间距
     bar_width = 0.2
     bar_gap = 0.05
-
-    # 创建图形和坐标轴
     if ax is None:
         fig, ax = plt.subplots(figsize=(4, 6))
     else:
         fig = ax.get_figure()
-    # fig, ax = plt.subplots(figsize=(8, 6))
-
     max_val = -1
     colors = [plt.cm.tab10(3),plt.cm.tab10(0),plt.cm.tab10(1),plt.cm.tab10(2)]
     for i in range(len(all_data)):
@@ -175,18 +131,13 @@ def plot_res_mysplit(col, method_datas, method_names=['PRNet', 'ChemCPA', 'CatCr
         max_val = max(max_val, data.max())
         for j in range(len(data)):
             color = colors[j]
-            # 调整柱状图的位置
             bar_positions = np.arange(len(experiments)) + (j - 1) * bar_width + bar_gap
             ax.bar(bar_positions[i], data[j], width=bar_width, label=method_names[j],
                    capsize=5, color=color)
-
-    
     ax.set_xticks(np.arange(len(experiments))+ bar_gap+np.array([(j - 1) * bar_width for j in range(len(data))]).mean())
     ax.set_xticklabels(experiments)
     ax.set_title(method_datas[0].columns[col])
     ax.set_ylim(0, max_val * 1.1)
-
-    # 添加图例
     if col==9:
         handles, labels = ax.get_legend_handles_labels()
         print(handles, labels)
