@@ -32,7 +32,7 @@ Train and test a CrossDiT model
 ```
 python train_split.py --cfg Cross
 ```
-Train and test a CrossDiT model
+Train and test a CatCrossDiT model
 ```
 python train_split.py --cfg CatBasicCross
 ```
