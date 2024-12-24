@@ -1,4 +1,4 @@
-# Predicting transcriptional response to chemical perturbation using multi-conditional diffusion transformer
+# Predicting drug-perturbed transcriptional responses using multi-conditional diffusion transformer
 
 <p align="center"><img src="src\data\PertDiT.png" alt="PertDiT" width="900px" /></p>
 
